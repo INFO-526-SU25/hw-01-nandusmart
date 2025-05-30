@@ -198,7 +198,6 @@ ggplot(county %>% filter(!is.na(median_edu))) +
 
 ```
 
-
 ```{r}
 
 ### (c)
@@ -217,14 +216,17 @@ ggplot(county %>% filter(!is.na(median_edu))) +
   ##Plot C
   ggplot(county, aes(x = homeownership, y = poverty)) +
   geom_point() +
-  geom_smooth(method = "gam", se = TRUE, color = "green", size = 1.2) +
+  geom_smooth(method = "gam", se = FALSE, color = "green", size = 1.2) +
+    geom_smooth(method = "glm", se = FALSE, color = "green", size = 1.2) +
   ggtitle("Plot C")
   
   ##Plot D
   ggplot(county, aes(x = homeownership, y = poverty)) +
   geom_point() +
-  geom_smooth(data = subset(county, homeownership > 25 & homeownership < 85),
+  geom_smooth(data = subset(county, homeownership > 25 & homeownership < 85), se = FALSE, 
               method = "lm", color = "blue") +
+    geom_smooth(data = subset(county, homeownership > 25 & homeownership < 85), se = FALSE, 
+              method = "gam", color = "blue") +
   ggtitle("Plot D")
   
   ##Plot E
@@ -253,6 +255,72 @@ ggplot(county %>% filter(!is.na(median_edu))) +
 
 ```
 
-## 4 - Rental apartments in SF
+## 4 - Credit Card Balances
+
+```{r}
+creditcard <- read_csv("data/credit.csv")
+
+```
+```{r}
+  ### (a)
+
+  ggplot(creditcard, aes(x = income, y = balance)) +
+  geom_point(aes(color = student, shape = student), alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, aes(color = student)) +
+  scale_color_manual(values = c("No" = "orange", "Yes" = "pink3")) +
+  facet_grid(student ~ married, labeller = labeller(married = label_both,
+    student = label_both)) +
+  scale_x_continuous(labels = label_dollar(prefix="$", suffix = "k")) +
+  scale_y_continuous(labels = label_dollar(prefix="$")) +
+  labs(x = "Income", y = "Credit card balance") + 
+  theme(
+    strip.background = element_rect(fill = "gray90", color = "black"),
+    strip.text = element_text(face = "bold"), legend.position = "none",
+    panel.border = element_rect(color = "black", fill = NA)
+  )
+
+### As Income increases Credit Card Balance too increases. Married people tends to have higher balances.
+```
+
+
+```{r}
+  ### (b)
+
+### Married Students tend to have considerably lesser balances and at the same time relatively higher salries are earned. ANd these variables are great in predicting the balance trends and helps in highlighting the clear differences
+```
+
+```{r}
+  ### (c)
+  creditcard <- creditcard %>%
+  mutate(utz = balance / limit)
+
+  ggplot(creditcard, aes(x = income, y = utz)) +
+  geom_point(aes(color = student, shape = student), alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, aes(color = student)) +
+  scale_color_manual(values = c("No" = "orange", "Yes" = "pink3")) +
+  facet_grid(student ~ married, labeller = labeller(
+    student = c("No" = "student: No", "Yes" = "student: Yes"),
+    married = c("No" = "married: No", "Yes" = "married: Yes")
+  )) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+    scale_x_continuous(labels = label_dollar(prefix="$", suffix = "k")) +
+  labs(
+    x = "Income",
+    y = "Credit utilization"
+  ) +
+  theme(
+    strip.background = element_rect(fill = "gray90", color = "black"),
+    strip.text = element_text(face = "bold"), legend.position = "none",
+    panel.border = element_rect(color = "black", fill = NA)
+  )
+  
+```
+
+```{r}
+  ### (d)
+
+### The relationship btw Income & Credit utilization is completely different from (b). Credit utilization by married is more compared to other group. This difference is good for interpreting the Credit behavior with various sets of people.
+```
+
 
 ## 5 - Napoleon’s march.
