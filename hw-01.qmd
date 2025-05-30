@@ -1,3 +1,7 @@
+::: hand
+All responses are in comments within the code****
+:::
+
 ---
 title: "HW 01"
 author: "Nandakumar Kuthalaraja"
@@ -15,7 +19,7 @@ editor_options:
 if (!require("pacman")) 
   install.packages("pacman")
 
-pacman::p_load(tidyverse, glue, scales, ggthemes, openintro)
+pacman::p_load(tidyverse, glue, scales, ggthemes, openintro, ggrepel)
 
 devtools::install_github("tidyverse/dsbox")
 # set theme for ggplot2
@@ -324,3 +328,94 @@ creditcard <- read_csv("data/credit.csv")
 
 
 ## 5 - Napoleon’s march.
+
+```{r}
+
+### Reference from -- https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/
+### Detailed explanation below for this plot's snippets
+
+### Load data into napoleon variable from the RDS file (RDS is an R Object file) which contains 3 components - troop movement, cities & temperature data 
+napoleon <- read_rds("data/napoleon.rds")
+
+### Extra respective data components to the variables
+cities <- napoleon[[1]]
+temp <- napoleon[[2]]
+troops <- napoleon[[3]]
+
+### Create new variable which will combine temp & date
+temps.nice <- temp %>%
+  mutate(nice.label = paste0(temp, "°, ", month, ". ", day))
+
+
+###Instantiate the plot with geom function to draw line, which represent the path of troop movement... Colored by direction of the movement & sized by number of survivors. 
+march.1812.plot.simple <- ggplot() +
+  geom_path(data = troops, aes(x = long, y = lat, group = group,
+                               color = direction, size = survivors),
+            lineend = "round") +
+  
+  ### Adding cities as points in the plot as Orange color
+  geom_point(data = cities, aes(x = long, y = lat),
+             color = "orange") +
+  
+  ### Adding labels for Cities
+  geom_text_repel(data = cities, aes(x = long, y = lat, label = city),
+                  color = "orange") +
+  
+  ### Adjusts Thickness 
+  scale_size(range = c(0.5, 10)) +
+  
+  ### Manually set color for the direction
+  scale_colour_manual(values = c("blue", "black")) +
+  
+  ### Hide Legend (for ink to data ratio)
+  guides(color = FALSE, size = FALSE) +
+  
+
+  ### Customized Labels
+  labs(
+      title = "Napoleon's Troop Campaign",
+      subtitle = "Path and size of the army during the campaign",
+      x = "Longitude",
+      y = "Latitude",
+      caption = "Data source: https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/"
+    )
+
+### New PLot showing temp against longitude
+temps.1812.plot <- ggplot(data = temps.nice, aes(x = long, y = temp)) +
+  geom_line() +
+  
+  ### Formatted Labels
+  geom_label(aes(label = nice.label), size = 2.5) +
+  
+  ### Add label to Y axis
+  labs(x = NULL, y = "° Celsius") +
+  
+  ### Plot similar to match above plot of troop movement
+  scale_x_continuous(limits = ggplot_build(march.1812.plot.simple)$layout$panel_ranges[[1]]$x.range) +
+  
+  ### Move label to Right
+  scale_y_continuous(position = "right") +
+  coord_cartesian(ylim = c(-35, 5)) + 
+  
+  ### Remove the grid components, borders & text at X axis
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_blank(), axis.ticks = element_blank(),
+        panel.border = element_blank())
+
+### Combine 2 plots
+both.1812.plot.simple <- rbind(ggplotGrob(march.1812.plot.simple),
+                               ggplotGrob(temps.1812.plot))
+panels <- both.1812.plot.simple$layout$t[grep("panel", both.1812.plot.simple$layout$name)]
+
+### Adjust ratio of height for both plots acording to input
+both.1812.plot.simple$heights[panels] <- unit(c(3, 1), "null")
+
+
+### Final combined plot
+grid::grid.newpage()
+grid::grid.draw(both.1812.plot.simple)
+
+
+```
