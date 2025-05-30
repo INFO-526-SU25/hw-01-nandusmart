@@ -15,7 +15,7 @@ editor_options:
 if (!require("pacman")) 
   install.packages("pacman")
 
-pacman::p_load(tidyverse, glue, scales, ggthemes)
+pacman::p_load(tidyverse, glue, scales, ggthemes, openintro)
 
 devtools::install_github("tidyverse/dsbox")
 # set theme for ggplot2
@@ -80,10 +80,178 @@ Plot shows the distribution of accidents categorized into 3 severity and plotted
 ## 2 - NYC marathon winners
 
 ```{r label-me-2}
+# Reading the Dataset
+marathon <- read_csv("data/nyc_marathon.csv")
+glimpse(marathon)
 
+  
+```
+
+```{r label-me-2}
+
+# (a)
+  
+  marathon_a <- marathon %>%
+    mutate(time_seconds = period_to_seconds(hms(time)))  %>%
+    filter(is.finite(time_seconds))
+  
+  #Plot histogram
+  ggplot(marathon_a, aes(x = time_seconds / 60)) +  
+    geom_histogram(binwidth = 10, fill = "green4", color = "black") +
+    labs(
+      title = "Distribution of Finish Times",
+      x = "Finish Time",
+      y = "Number of Runners"
+    ) 
+  
+  #Plot Boxplot
+  ggplot(marathon_a, aes(x = time_seconds / 60)) +
+  geom_boxplot(fill = "lightgreen", color = "green4", outlier.color = "black") +
+  labs(
+    title = "Boxplot of Finish Times",
+    x = "Finish Time (minutes)"
+  )
+
+  ### Boxplot has ability to show outliers & medians effectively, while histogram shows more detailed distribution of data as towers
+  
+```
+
+```{r label-me-2}
+
+# (b)
+  
+  #Plot Boxplot
+  ggplot(marathon_a, aes(x = division, y = time_seconds / 60, fill = division)) +
+  geom_boxplot(alpha = 0.6, color = "darkgray") +
+  labs(
+    title = "Finish Times by Gender",
+    x = "Division",
+    y = "Finish Time"
+  ) +
+  scale_fill_manual(values = c("Men" = "green4", "Women" = "orange"))
+
+  ### Men has aggressive median Finish times than Women and Women runners are more staggered outliers compared to Men
+  
+```
+
+```{r label-me-2}
+
+# (c)
+  
+  ### Legend is redundant, removing it decrease amount of information in plot and makes less content and more clarity
+
+  #Plot Boxplot
+  ggplot(marathon_a, aes(x = division, y = time_seconds / 60, fill = division)) +
+  geom_boxplot(alpha = 0.6, color = "darkgray") +
+  labs(
+    title = "Finish Times by Gender",
+    x = "Division",
+    y = "Finish Time"
+  ) +
+  scale_fill_manual(values = c("Men" = "green4", "Women" = "orange")) + theme(legend.position="none")
+  
+```
+
+```{r label-me-2}
+
+# (d)
+  
+  ggplot(marathon_a, aes(x = year, y = time_seconds / 60, color = division)) +
+  geom_line(size = 1) +
+  geom_point(alpha = 0.7) + scale_color_manual(
+    values = c("Men" = "black", "Women" = "blue")
+  )
+  labs(
+    title = "Winning Times Over the Years",
+    x = "Year",
+    y = "Finish Time",
+    color = "Division"
+  ) 
+  
+  
+  ### We can infer trends here compared to other plots
+  
 ```
 
 ## 3 - US counties
+
+```{r}
+
+### (a) Since X-axis is completely different for both, boxplot didn't even render... Don't think this snippet is using correct params
+
+ggplot(county) +
+  geom_point(aes(x = median_edu, y = median_hh_income)) +
+  geom_boxplot(aes(x = smoking_ban, y = pop2017))
+```
+
+```{r}
+
+### (b) Plots with column facet grid looks visually clear and easy to comprehend, use row facet based grid when you want to avoid horizontal scrolling, while the other one when there are moderate number of variables for better clarity
+
+ggplot(county %>% filter(!is.na(median_edu))) + 
+  geom_point(aes(x = homeownership, y = poverty)) + 
+  facet_grid(median_edu ~ .)
+
+ggplot(county %>% filter(!is.na(median_edu))) + 
+  geom_point(aes(x = homeownership, y = poverty)) + 
+  facet_grid(. ~ median_edu)
+
+```
+
+
+```{r}
+
+### (c)
+
+  ##Plot A
+  ggplot(county, aes(x = homeownership, y = poverty)) +
+  geom_point() +
+  ggtitle("Plot A")
+
+  ##Plot B
+  ggplot(county, aes(x = homeownership, y = poverty)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  ggtitle("Plot B")
+
+  ##Plot C
+  ggplot(county, aes(x = homeownership, y = poverty)) +
+  geom_point() +
+  geom_smooth(method = "gam", se = TRUE, color = "green", size = 1.2) +
+  ggtitle("Plot C")
+  
+  ##Plot D
+  ggplot(county, aes(x = homeownership, y = poverty)) +
+  geom_point() +
+  geom_smooth(data = subset(county, homeownership > 25 & homeownership < 85),
+              method = "lm", color = "blue") +
+  ggtitle("Plot D")
+  
+  ##Plot E
+  ggplot(county, aes(x = homeownership, y = poverty, color = metro)) +
+  geom_point() +
+  geom_smooth(method = "lm", aes(linetype = metro), se = FALSE) +
+  ggtitle("Plot E")
+
+  ##Plot F
+  ggplot(county, aes(x = homeownership, y = poverty, color = metro)) +
+  geom_point() +
+  geom_smooth(method = "gam", se = FALSE) +
+  ggtitle("Plot F")
+
+  ##Plot G
+  ggplot(county, aes(x = homeownership, y = poverty)) +
+  geom_point(aes(color = metro)) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  ggtitle("Plot G")
+  
+  ##Plot H
+  ggplot(county, aes(x = homeownership, y = poverty, color = metro)) +
+  geom_point() +
+  ggtitle("Plot H")
+
+
+```
 
 ## 4 - Rental apartments in SF
 
