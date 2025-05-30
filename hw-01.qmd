@@ -57,8 +57,7 @@ ggplot(accidents, aes(x = time, fill = severity)) +
   scale_fill_manual(values = c("Fatal" = "gray", "Serious" = "deepskyblue3", "Slight" = "yellow3")) + # Closest color I can get by
   scale_color_colorblind() +
   scale_x_time(
-    breaks = hms::as_hms(c("00:00:00", "06:00:00", "12:00:00", "18:00:00", "24:00:00")),
-    labels = c("00:00", "06:00", "12:00", "18:00", "24:00")
+    breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00"))
   ) +
   labs(
     title = "Number of accidents throughout the day",
@@ -75,7 +74,7 @@ ggplot(accidents, aes(x = time, fill = severity)) +
 ::: hand
 **Interpretation**:
 
-Plot shows the distribution of accidents categorized into 3 severities and plotted in 2 charts covering weekend & weekdays
+Plot shows the distribution of accidents categorized into 3 severity and plotted in 2 charts covering weekend & weekdays
 :::
 
 ## 2 - NYC marathon winners
