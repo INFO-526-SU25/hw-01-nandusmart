@@ -1,10 +1,12 @@
 ---
 title: "HW 01"
-author: "INSERT YOUR NAME HERE"
-format: 
-  html:
-    embed-resources: true
-toc: true
+author: "Nandakumar Kuthalaraja"
+format: revealjs
+highlight-style: a11y
+execute:
+  code-link: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## 0 - Setup
@@ -13,17 +15,68 @@ toc: true
 if (!require("pacman")) 
   install.packages("pacman")
 
-# use this line for installing/loading
-# pacman::p_load() 
+pacman::p_load(tidyverse, glue, scales, ggthemes)
 
 devtools::install_github("tidyverse/dsbox")
+# set theme for ggplot2
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+
+# set width of code output
+options(width = 65)
+
+# set figure parameters for knitr
+knitr::opts_chunk$set(
+  fig.width = 7,        # 7" width
+  fig.asp = 0.618,      # the golden ratio
+  fig.retina = 3,       # dpi multiplier for displaying HTML output on retina
+  fig.align = "center", # center align figures
+  dpi = 300             # higher dpi, sharper image
+)
+
 ```
 
 ## 1 - Road traffic accidents in Edinburgh
 
 ```{r label-me-1}
 
+# Reading the Dataset
+accidents <- read_csv("data/accidents.csv")
+
+accidents <- accidents %>%
+  mutate(
+    day_type = if_else(
+    wday(date) == 1 | wday(date) == 7,  # Sunday (1) or Saturday (7)
+    "Weekend",
+    "Weekday"
+  ))
+
+ggplot(accidents, aes(x = time, fill = severity)) +
+  geom_density(alpha = 0.7) +
+  #  facet_wrap(~ day_type) +
+  facet_wrap(~day_type, ncol = 1) +
+  scale_fill_manual(values = c("Fatal" = "gray", "Serious" = "deepskyblue3", "Slight" = "yellow3")) + # Closest color I can get by
+  scale_color_colorblind() +
+  scale_x_time(
+    breaks = hms::as_hms(c("00:00:00", "06:00:00", "12:00:00", "18:00:00", "24:00:00")),
+    labels = c("00:00", "06:00", "12:00", "18:00", "24:00")
+  ) +
+  labs(
+    title = "Number of accidents throughout the day",
+    subtitle = "By day of week and severity",
+    x = "Time of day",
+    y = "Density",
+    fill = "Severity"
+  ) +
+  theme(
+    legend.position = "right"
+  )
 ```
+
+::: hand
+**Interpretation**:
+
+Plot shows the distribution of accidents categorized into 3 severities and plotted in 2 charts covering weekend & weekdays
+:::
 
 ## 2 - NYC marathon winners
 
