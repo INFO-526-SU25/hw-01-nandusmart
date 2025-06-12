@@ -1,11 +1,12 @@
-::: hand
-All responses are in comments within the code****
-:::
-
 ---
 title: "HW 01"
 author: "Nandakumar Kuthalaraja"
-format: revealjs
+format: 
+  html:
+      code-fold: false
+      code-tools: true
+      toc: true
+      number-sections: true
 highlight-style: a11y
 execute:
   code-link: true
@@ -36,6 +37,10 @@ knitr::opts_chunk$set(
   fig.align = "center", # center align figures
   dpi = 300             # higher dpi, sharper image
 )
+
+
+
+###All responses are in comments within the code****
 
 ```
 
@@ -83,15 +88,17 @@ Plot shows the distribution of accidents categorized into 3 severity and plotted
 
 ## 2 - NYC marathon winners
 
-```{r label-me-2}
+### (a)
+
+```{r label-me-6}
 # Reading the Dataset
 marathon <- read_csv("data/nyc_marathon.csv")
-glimpse(marathon)
+
 
   
 ```
 
-```{r label-me-2}
+```{r label-me-3}
 
 # (a)
   
@@ -108,6 +115,13 @@ glimpse(marathon)
       y = "Number of Runners"
     ) 
   
+  
+```
+
+```{r label-me-3a}
+
+
+  
   #Plot Boxplot
   ggplot(marathon_a, aes(x = time_seconds / 60)) +
   geom_boxplot(fill = "lightgreen", color = "green4", outlier.color = "black") +
@@ -120,7 +134,9 @@ glimpse(marathon)
   
 ```
 
-```{r label-me-2}
+### (b)
+
+```{r label-me-4}
 
 # (b)
   
@@ -138,7 +154,9 @@ glimpse(marathon)
   
 ```
 
-```{r label-me-2}
+### (c)
+
+```{r label-me-5}
 
 # (c)
   
@@ -155,6 +173,8 @@ glimpse(marathon)
   scale_fill_manual(values = c("Men" = "green4", "Women" = "orange")) + theme(legend.position="none")
   
 ```
+
+### (d)
 
 ```{r label-me-2}
 
@@ -179,6 +199,8 @@ glimpse(marathon)
 
 ## 3 - US counties
 
+### (a)
+
 ```{r}
 
 ### (a) Since X-axis is completely different for both, boxplot didn't even render... Don't think this snippet is using correct params
@@ -187,6 +209,8 @@ ggplot(county) +
   geom_point(aes(x = median_edu, y = median_hh_income)) +
   geom_boxplot(aes(x = smoking_ban, y = pop2017))
 ```
+
+### (b)
 
 ```{r}
 
@@ -201,6 +225,8 @@ ggplot(county %>% filter(!is.na(median_edu))) +
   facet_grid(. ~ median_edu)
 
 ```
+
+### (c)
 
 ```{r}
 
@@ -265,6 +291,7 @@ ggplot(county %>% filter(!is.na(median_edu))) +
 creditcard <- read_csv("data/credit.csv")
 
 ```
+
 ```{r}
   ### (a)
 
@@ -285,7 +312,6 @@ creditcard <- read_csv("data/credit.csv")
 
 ### As Income increases Credit Card Balance too increases. Married people tends to have higher balances.
 ```
-
 
 ```{r}
   ### (b)
@@ -325,7 +351,6 @@ creditcard <- read_csv("data/credit.csv")
 
 ### The relationship btw Income & Credit utilization is completely different from (b). Credit utilization by married is more compared to other group. This difference is good for interpreting the Credit behavior with various sets of people.
 ```
-
 
 ## 5 - Napoleon’s march.
 
