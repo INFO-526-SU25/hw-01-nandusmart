@@ -3,10 +3,11 @@ title: "HW 01"
 author: "Nandakumar Kuthalaraja"
 format: 
   html:
-      code-fold: false
-      code-tools: true
-      toc: true
-      number-sections: true
+    embed-resources: true
+    code-fold: false
+    code-tools: true
+    toc: true
+    number-sections: true
 highlight-style: a11y
 execute:
   code-link: true
